@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  USER
+  ADMIN
+  RESCUE_TEAM
+}
+
+enum EmergencyType {
+  FLOOD
+  EARTHQUAKE
+  LANDSLIDE
+  FIRE
+  ACCIDENT
+  CYCLONE
+  BUILDING_COLLAPSE
+  MEDICAL_EMERGENCY
+  OTHER
+}
+
+enum EmergencyStatus {
+  NEW
+  ANALYZING
+  TEAM_ASSIGNED
+  RESCUE_IN_PROGRESS
+  RESOLVED
+  CANCELLED
+}
+
+enum EmergencyPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TeamStatus {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+enum ResourceStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  UNAVAILABLE
+}
+
+enum RescueAssignmentStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  ARRIVED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  passwordHash  String
+  role          Role          @default(USER)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  emergencies   Emergency[]
+  notifications Notification[] @relation("UserNotifications")
+}
+
+model Admin {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  passwordHash  String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  notifications Notification[] @relation("AdminNotifications")
+}
+
+model RescueTeam {
+  id                 String            @id @default(cuid())
+  teamCode           String            @unique
+  name               String
+  membersCount       Int
+  latitude           Float
+  longitude          Float
+  baseLocation       String
+  availabilityStatus TeamStatus        @default(AVAILABLE)
+  contactInfo        String
+  capabilities       String
+  availableEquipment String
+  currentAssignment  String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  account            RescueTeamAccount?
+  assignedEmergencies Emergency[]      @relation("AssignedTeam")
+  rescueAssignments  RescueAssignment[]
+  notifications      Notification[]    @relation("RescueTeamNotifications")
+}
+
+model RescueTeamAccount {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  passwordHash String
+  teamId      String     @unique
+  team        RescueTeam @relation(fields: [teamId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Emergency {
+  id                  String               @id @default(cuid())
+  userId              String?
+  user                User?                @relation(fields: [userId], references: [id])
+  emergencyType       EmergencyType
+  locationLabel       String?
+  latitude            Float
+  longitude           Float
+  description         String?
+  status              EmergencyStatus      @default(NEW)
+  priority            EmergencyPriority    @default(MEDIUM)
+  assignedTeamId      String?
+  assignedTeam        RescueTeam?          @relation("AssignedTeam", fields: [assignedTeamId], references: [id])
+  timestamp           DateTime             @default(now())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  rescueAssignments   RescueAssignment[]
+  notifications       Notification[]
+  resourceAssignments ResourceAssignment[]
+
+  @@index([status])
+  @@index([latitude, longitude])
+  @@index([createdAt])
+}
+
+model Resource {
+  id               String             @id @default(cuid())
+  resourceId       String             @unique
+  name             String
+  category         String
+  quantity         Int
+  availableQuantity Int
+  latitude         Float
+  longitude        Float
+  status           ResourceStatus     @default(AVAILABLE)
+  description      String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  assignments      ResourceAssignment[]
+
+  @@index([status])
+  @@index([category])
+}
+
+model ResourceAssignment {
+  id         String    @id @default(cuid())
+  resourceId String
+  emergencyId String?
+  quantity   Int
+  status     String    @default("ASSIGNED")
+  createdAt  DateTime  @default(now())
+  resource   Resource  @relation(fields: [resourceId], references: [id])
+  emergency  Emergency? @relation(fields: [emergencyId], references: [id])
+}
+
+model RescueAssignment {
+  id          String                 @id @default(cuid())
+  emergencyId String
+  teamId      String
+  status      RescueAssignmentStatus @default(PENDING)
+  reason      String?
+  assignedAt  DateTime               @default(now())
+  acceptedAt  DateTime?
+  completedAt DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  emergency   Emergency              @relation(fields: [emergencyId], references: [id])
+  team        RescueTeam             @relation(fields: [teamId], references: [id])
+
+  @@index([status])
+}
+
+model Notification {
+  id         String      @id @default(cuid())
+  type       String
+  message    String
+  userId     String?
+  adminId    String?
+  teamId     String?
+  emergencyId String?
+  isRead     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  user       User?       @relation("UserNotifications", fields: [userId], references: [id])
+  admin      Admin?      @relation("AdminNotifications", fields: [adminId], references: [id])
+  team       RescueTeam? @relation("RescueTeamNotifications", fields: [teamId], references: [id])
+  emergency  Emergency?  @relation(fields: [emergencyId], references: [id])
+}
