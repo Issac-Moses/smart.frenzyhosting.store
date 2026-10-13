@@ -544,6 +544,8 @@ export function UserDashboardClient({
             </div>
           </section>
         </div>
+      ) : null}
+
       {/* How to Use Instruction Modal (shows on login / visit) */}
       {showInstructions ? (
         <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm" role="presentation">
