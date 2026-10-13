@@ -1,7 +1,7 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["nodejs_20", "openssl"]
+      "nixPkgs": ["nodejs_22", "openssl"]
     },
     "install": {
       "cmds": ["npm ci"]
