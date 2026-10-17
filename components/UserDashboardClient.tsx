@@ -9,6 +9,7 @@ import {
   EvacuationRecommendationCard,
   type EvacuationRecommendationData,
 } from '@/components/EvacuationRecommendationCard';
+import { UserChatbotAssistant } from '@/components/UserChatbotAssistant';
 
 const MapPanel = dynamic(
   () => import('@/components/MapPanel').then((module) => module.MapPanel),
@@ -634,6 +635,12 @@ export function UserDashboardClient({
           </section>
         </div>
       ) : null}
+
+      {/* AI Chatbot Assistant Popup */}
+      <UserChatbotAssistant
+        userName={initialUser.name}
+        activeEmergency={currentEmergency || submittedEmergency}
+      />
     </div>
   );
 }
