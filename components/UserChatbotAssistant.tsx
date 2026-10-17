@@ -149,12 +149,12 @@ export function UserChatbotAssistant({ userName = 'Citizen', activeEmergency }: 
   return (
     <>
       {/* Floating Trigger Button (Bottom Right) */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-[9999]">
         {!isOpen && (
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-3.5 text-white shadow-2xl shadow-sky-500/30 transition-all duration-300 hover:scale-105 hover:shadow-sky-500/50 active:scale-95"
+            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-3.5 text-white shadow-2xl shadow-sky-500/30 transition-all duration-300 hover:scale-105 hover:shadow-sky-500/50 active:scale-95 cursor-pointer"
             aria-label="Open AI Rescue Assistant"
           >
             <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-lg">
@@ -174,7 +174,7 @@ export function UserChatbotAssistant({ userName = 'Citizen', activeEmergency }: 
 
       {/* Floating Chatbot Popup Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[520px] w-[92vw] max-w-[380px] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed bottom-6 right-6 z-[9999] flex h-[520px] w-[92vw] max-w-[380px] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/30 backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
           <div className="relative flex items-center justify-between bg-gradient-to-r from-sky-700 via-sky-800 to-indigo-800 px-4 py-3.5 text-white">
             <div className="flex items-center gap-3">
