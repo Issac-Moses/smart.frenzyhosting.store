@@ -195,19 +195,22 @@ export function AdminDashboardClient({
 
   async function retryMatching(emergencyId: string) {
     setMatchingEmergencyId(emergencyId);
-    setMessage('');
+    setMessage(null);
     try {
       const response = await fetch(`/api/admin/emergencies/${emergencyId}/match`, { method: 'POST' });
       const result = await response.json();
       if (!response.ok) {
-        setMessage(result.error ?? 'Could not retry emergency matching.');
+        setMessage({ type: 'error', text: result.error ?? 'Could not retry emergency matching.' });
         return;
       }
       const teamName = result.result?.emergency?.assignedTeam?.name;
-      setMessage(teamName ? `Matching complete. Assigned to ${teamName}.` : result.result?.recommendation?.reason ?? 'No team assigned; admin review required.');
+      setMessage({
+        type: 'success',
+        text: teamName ? `Matching complete. Assigned to ${teamName}.` : result.result?.recommendation?.reason ?? 'No team assigned; admin review required.',
+      });
       router.refresh();
     } catch {
-      setMessage('Network error while retrying emergency matching.');
+      setMessage({ type: 'error', text: 'Network error while retrying emergency matching.' });
     } finally {
       setMatchingEmergencyId(null);
     }
